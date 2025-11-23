@@ -6,7 +6,7 @@ export const users = pgTable('users', {
   
   // Basic Info
   email: varchar('email', { length: 255 }).notNull().unique(),
-  passwordHash: varchar('password_hash', { length: 255 }), // NULL for OAuth-only users
+  passwordHash: varchar('password_hash', { length: 255 }), // NULL for OAuth-only users will be handled in app logic later
   username: varchar('username', { length: 50 }).notNull().unique(),
   fullName: varchar('full_name', { length: 255 }),
   avatarUrl: text('avatar_url'), // Gravatar or OAuth profile pic
@@ -23,7 +23,7 @@ export const users = pgTable('users', {
   
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().$onUpdate(() => new Date()),
   lastLoginAt: timestamp('last_login_at', { withTimezone: true }),
 }, (table) => ({
   emailIdx: index('idx_users_email').on(table.email),
@@ -50,7 +50,7 @@ export const oauthConnections = pgTable('oauth_connections', {
   
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
-  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow(),
+  updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().$onUpdate(() => new Date()),
 }, (table) => ({
   // Ensure one connection per provider per user
   providerIdx: uniqueIndex('idx_oauth_provider').on(table.provider, table.providerUserId),
