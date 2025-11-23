@@ -1,0 +1,77 @@
+@layer animations {
+
+    /* Fade In */
+    @keyframes ds-fade-in {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .ds-animate-fade-in {
+        animation: ds-fade-in var(--ds-transition-slow) ease-out;
+    }
+
+    /* Slide In Right */
+    @keyframes ds-slide-right {
+        from {
+            transform: translateX(0);
+        }
+
+        to {
+            transform: translateX(4px);
+        }
+    }
+
+    .ds-animate-slide-right {
+        animation: ds-slide-right var(--ds-transition-fast) ease-out forwards;
+    }
+
+    /* Pulse (for logo) */
+    @keyframes ds-pulse {
+
+        0%,
+        100% {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        50% {
+            opacity: 0.95;
+            transform: scale(1.02);
+        }
+    }
+
+    .ds-animate-pulse {
+        animation: ds-pulse 3s ease-in-out infinite;
+    }
+
+    /* Gold Gradient Animation */
+    @keyframes ds-gold-shimmer {
+        0% {
+            background-position: 0% 50%;
+        }
+
+        50% {
+            background-position: 100% 50%;
+        }
+
+        100% {
+            background-position: 0% 50%;
+        }
+    }
+
+    .ds-gold-gradient {
+        background: linear-gradient(135deg,
+                var(--ds-color-gold-start),
+                var(--ds-color-gold-mid),
+                var(--ds-color-gold-end));
+        background-size: 200% 200%;
+        animation: ds-gold-shimmer 4s ease infinite;
+    }
+}

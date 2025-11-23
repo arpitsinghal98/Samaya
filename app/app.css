@@ -1,5 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+/* Import our custom design system */
+@import "./styles/design-system/tokens.css";
+@import "./styles/design-system/typography.css";
+@import "./styles/design-system/components.css";
+@import "./styles/design-system/animations.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -128,6 +133,7 @@ body {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
