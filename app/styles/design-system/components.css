@@ -1,0 +1,130 @@
+@layer components {
+
+    /* Buttons */
+    .ds-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: var(--ds-space-2);
+        padding: var(--ds-space-3) var(--ds-space-6);
+        font-size: var(--ds-font-size-base);
+        font-weight: var(--ds-font-weight-medium);
+        border-radius: var(--ds-radius-md);
+        transition: all var(--ds-transition-base);
+        cursor: pointer;
+        border: none;
+        outline: none;
+    }
+
+    .ds-button-primary {
+        background-color: hsl(var(--ds-color-primary));
+        color: white;
+        box-shadow: var(--ds-shadow-sm);
+    }
+
+    .ds-button-primary:hover {
+        background-color: hsl(var(--ds-color-primary-hover));
+        box-shadow: var(--ds-shadow-md);
+        transform: translateY(-1px);
+    }
+
+    .ds-button-ghost {
+        background-color: transparent;
+        color: hsl(var(--ds-color-text-primary));
+        border: var(--ds-border-width-thin) solid hsl(var(--ds-color-border));
+    }
+
+    .ds-button-ghost:hover {
+        background-color: hsl(var(--ds-color-accent));
+        border-color: hsl(var(--ds-color-border-hover));
+    }
+
+    /* Cards */
+    .ds-card {
+        background-color: hsl(var(--ds-color-surface));
+        border: var(--ds-border-width-thin) solid hsl(var(--ds-color-border));
+        border-radius: var(--ds-radius-lg);
+        padding: var(--ds-space-6);
+        box-shadow: var(--ds-shadow-sm);
+        transition: all var(--ds-transition-base);
+    }
+
+    .ds-card:hover {
+        box-shadow: var(--ds-shadow-md);
+        border-color: hsl(var(--ds-color-border-hover) / 0.5);
+    }
+
+    /* macOS Window */
+    .ds-macos-window {
+        background-color: hsl(var(--ds-color-surface));
+        border: var(--ds-border-width-thin) solid hsl(var(--ds-color-border));
+        border-radius: var(--ds-radius-lg);
+        overflow: hidden;
+        box-shadow: var(--ds-shadow-lg);
+        backdrop-filter: blur(12px);
+    }
+
+    .ds-macos-header {
+        display: flex;
+        align-items: center;
+        gap: var(--ds-space-2);
+        padding: var(--ds-space-3) var(--ds-space-4);
+        border-bottom: var(--ds-border-width-thin) solid hsl(var(--ds-color-border));
+        background-color: hsl(var(--ds-color-bg-secondary));
+    }
+
+    .ds-macos-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: var(--ds-radius-full);
+    }
+
+    .ds-macos-dot-red {
+        background-color: #FF5F57;
+    }
+
+    .ds-macos-dot-yellow {
+        background-color: #FFBD2E;
+    }
+
+    .ds-macos-dot-green {
+        background-color: #28CA42;
+    }
+
+    /* Time Slot */
+    .ds-time-slot {
+        display: flex;
+        align-items: center;
+        gap: var(--ds-space-3);
+        padding: var(--ds-space-3) var(--ds-space-4);
+        border: var(--ds-border-width-thin) solid hsl(var(--ds-color-border));
+        border-radius: var(--ds-radius-md);
+        background-color: hsl(var(--ds-color-bg-primary));
+        transition: all var(--ds-transition-fast);
+        cursor: not-allowed;
+    }
+
+    .ds-time-slot:hover {
+        background-color: hsl(var(--ds-color-accent));
+        border-color: hsl(var(--ds-color-border-hover) / 0.3);
+    }
+
+    .ds-time-slot-radio {
+        width: 16px;
+        height: 16px;
+        border: var(--ds-border-width-medium) solid hsl(var(--ds-color-border));
+        border-radius: var(--ds-radius-full);
+        transition: all var(--ds-transition-fast);
+    }
+
+    /* Container & Layout */
+    .ds-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 var(--ds-space-6);
+    }
+
+    .ds-section {
+        padding: var(--ds-space-20) 0;
+    }
+}

@@ -3,24 +3,26 @@ import { pgTable, uuid, varchar, text, boolean, timestamp, index, uniqueIndex } 
 // ==================== USERS TABLE ====================
 export const users = pgTable('users', {
   id: uuid('id').primaryKey().defaultRandom(),
-  
+
   // Basic Info
   email: varchar('email', { length: 255 }).notNull().unique(),
   passwordHash: varchar('password_hash', { length: 255 }), // NULL for OAuth-only users will be handled in app logic later
   username: varchar('username', { length: 50 }).notNull().unique(),
   fullName: varchar('full_name', { length: 255 }),
   avatarUrl: text('avatar_url'), // Gravatar or OAuth profile pic
-  
+
   // Settings
   timezone: varchar('timezone', { length: 100 }).default('UTC'),
-  
+
   // Account Status
   emailVerified: boolean('email_verified').default(false),
+  verificationToken: varchar('verification_token', { length: 255 }),
+  verificationTokenExpiry: timestamp('verification_token_expiry', { withTimezone: true }),
   isActive: boolean('is_active').default(true),
-  
+
   // Subscription (for future)
   subscriptionTier: varchar('subscription_tier', { length: 50 }).default('free'), // free, pro, business
-  
+
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().$onUpdate(() => new Date()),
@@ -35,19 +37,19 @@ export const users = pgTable('users', {
 export const oauthConnections = pgTable('oauth_connections', {
   id: uuid('id').primaryKey().defaultRandom(),
   userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-  
+
   // OAuth Provider Info
   provider: varchar('provider', { length: 50 }).notNull(), // 'google' or 'microsoft'
   providerUserId: varchar('provider_user_id', { length: 255 }).notNull(), // Google/MS user ID
-  
+
   // Tokens
   accessToken: text('access_token'), // Encrypted
   refreshToken: text('refresh_token'), // Encrypted
   tokenExpiresAt: timestamp('token_expires_at', { withTimezone: true }),
-  
+
   // 🔑 IMPORTANT: Track what permissions user granted
   scope: text('scope'), // e.g., "openid email profile https://www.googleapis.com/auth/calendar"
-  
+
   // Timestamps
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow(),
   updatedAt: timestamp('updated_at', { withTimezone: true }).defaultNow().$onUpdate(() => new Date()),
