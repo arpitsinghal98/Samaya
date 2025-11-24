@@ -1,21 +1,41 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useFetcher } from 'react-router';
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
-import { Eye, EyeOff, Check, X } from 'lucide-react';
-import { useAuth } from '../../context/AuthContext';
+import { Eye, EyeOff, Check, X, Loader2 } from 'lucide-react';
 import { validateEmail, validatePassword } from '../../utils/validation';
 
 export function SignupCard() {
+    const fetcher = useFetcher();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [errors, setErrors] = useState<Record<string, string>>({});
+    const [successMessage, setSuccessMessage] = useState('');
 
     const passwordValidation = validatePassword(password);
     const showPasswordHints = password.length > 0;
+    const isSubmitting = fetcher.state === 'submitting';
+
+    // Handle API response
+    useEffect(() => {
+        if (fetcher.data) {
+            if (fetcher.data.errors) {
+                setErrors(fetcher.data.errors);
+                setSuccessMessage('');
+            } else if (fetcher.data.success) {
+                setSuccessMessage(fetcher.data.message);
+                setErrors({});
+                // Clear form
+                setEmail('');
+                setPassword('');
+                setConfirmPassword('');
+            }
+        }
+    }, [fetcher.data]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -42,14 +62,31 @@ export function SignupCard() {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            // TODO: Implement actual signup logic
-            console.log('Signup:', { email, password });
-            // After success: window.location.href = '/dashboard';
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+
+            fetcher.submit(formData, {
+                method: 'post',
+                action: '/api/auth/signup',
+            });
         }
     };
 
     return (
         <div className="p-8 space-y-6">
+            {successMessage && (
+                <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                    <p className="text-sm text-green-700 font-medium">{successMessage}</p>
+                </div>
+            )}
+
+            {errors.general && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                    <p className="text-sm text-red-600">{errors.general}</p>
+                </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
@@ -60,6 +97,7 @@ export function SignupCard() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className={errors.email ? 'border-red-500' : ''}
+                        disabled={isSubmitting}
                     />
                     {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                 </div>
@@ -74,11 +112,13 @@ export function SignupCard() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className={errors.password ? 'border-red-500' : ''}
+                            disabled={isSubmitting}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            disabled={isSubmitting}
                         >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -116,11 +156,13 @@ export function SignupCard() {
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             className={errors.confirmPassword ? 'border-red-500' : ''}
+                            disabled={isSubmitting}
                         />
                         <button
                             type="button"
                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            disabled={isSubmitting}
                         >
                             {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -128,8 +170,15 @@ export function SignupCard() {
                     {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword}</p>}
                 </div>
 
-                <Button type="submit" className="w-full">
-                    Create Account
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Creating account...
+                        </>
+                    ) : (
+                        'Create Account'
+                    )}
                 </Button>
             </form>
         </div>

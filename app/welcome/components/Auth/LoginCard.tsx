@@ -1,17 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useFetcher } from 'react-router';
 import { Input } from '~/components/ui/input';
 import { Button } from '~/components/ui/button';
 import { Label } from '~/components/ui/label';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, Loader2 } from 'lucide-react';
 import { OAuthButton } from './OAuthButton';
-import { useAuth } from '../../context/AuthContext';
 import { validateEmail } from '../../utils/validation';
 
 export function LoginCard() {
+    const fetcher = useFetcher();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
-    const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
+    const [errors, setErrors] = useState<{ email?: string; password?: string; general?: string }>({});
+
+    const isSubmitting = fetcher.state === 'submitting';
+
+    // Handle API response
+    useEffect(() => {
+        if (fetcher.data) {
+            if (fetcher.data.errors) {
+                setErrors(fetcher.data.errors);
+            }
+        }
+    }, [fetcher.data]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -30,9 +42,14 @@ export function LoginCard() {
         setErrors(newErrors);
 
         if (Object.keys(newErrors).length === 0) {
-            // TODO: Implement actual login logic
-            console.log('Login:', { email, password });
-            // After success: window.location.href = '/dashboard';
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('password', password);
+
+            fetcher.submit(formData, {
+                method: 'post',
+                action: '/api/auth/login',
+            });
         }
     };
 
@@ -44,6 +61,12 @@ export function LoginCard() {
     return (
         <div className="p-8 space-y-6">
             <form onSubmit={handleSubmit} className="space-y-4">
+                {errors.general && (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-md">
+                        <p className="text-sm text-red-600">{errors.general}</p>
+                    </div>
+                )}
+
                 <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -53,6 +76,7 @@ export function LoginCard() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className={errors.email ? 'border-red-500' : ''}
+                        disabled={isSubmitting}
                     />
                     {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
                 </div>
@@ -67,11 +91,13 @@ export function LoginCard() {
                             value={password}
                             onChange={(e) => setPassword(e.target.value)}
                             className={errors.password ? 'border-red-500' : ''}
+                            disabled={isSubmitting}
                         />
                         <button
                             type="button"
                             onClick={() => setShowPassword(!showPassword)}
                             className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                            disabled={isSubmitting}
                         >
                             {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                         </button>
@@ -79,8 +105,15 @@ export function LoginCard() {
                     {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
                 </div>
 
-                <Button type="submit" className="w-full">
-                    Sign In
+                <Button type="submit" className="w-full" disabled={isSubmitting}>
+                    {isSubmitting ? (
+                        <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Signing in...
+                        </>
+                    ) : (
+                        'Sign In'
+                    )}
                 </Button>
             </form>
 
